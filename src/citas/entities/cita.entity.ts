@@ -10,6 +10,7 @@ import {
 import { Paciente } from '../../pacientes/entities/paciente.entity';
 import { Profesional } from '../../profesionales/entities/profesional.entity';
 import { SlotDisponibilidad } from '../../agendas/entities/slot-disponibilidad.entity';
+import { Servicio } from 'src/servicios/entities/servicio.entity';
 
 @Entity('citas')
 export class Cita {
@@ -35,6 +36,18 @@ export class Cita {
   })
   @JoinColumn({ name: 'id_profesional' })
   profesional: Profesional;
+
+  // --- ¡NUEVA RELACIÓN CON SERVICIO! ---
+  @Column({ name: 'id_servicio', type: 'uuid', nullable: false })
+  idServicio: string; // Columna para la clave foránea del servicio
+
+  @ManyToOne(() => Servicio, (servicio) => servicio.citas, {
+    nullable: false, // Una cita SIEMPRE debe estar asociada a un servicio
+    onDelete: 'RESTRICT', // No se borra el servicio si tiene citas asociadas
+  })
+  @JoinColumn({ name: 'id_servicio' }) // Especifica la columna de la clave foránea
+  servicio: Servicio;
+  // --- FIN NUEVA RELACIÓN ---
 
   @Column({
     name: 'id_slot_disponibilidad',

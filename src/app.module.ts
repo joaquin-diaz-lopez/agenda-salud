@@ -3,6 +3,13 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
+import { AuthModule } from './auth/auth.module';
+import { UsuariosModule } from './usuarios/usuarios.module';
+import { RolesModule } from './roles/roles.module';
+import { ServiciosModule } from './servicios/servicios.module';
+import { ProfesionalServiciosModule } from './profesional-servicios/profesional-servicios.module';
+import { ProfesionalesModule } from './profesionales/profesionales.module';
+import { CentrosDeSaludModule } from './centros-de-salud/centros-de-salud.module';
 
 @Module({
   imports: [
@@ -10,8 +17,13 @@ import { DatabaseModule } from './database/database.module';
       isGlobal: true,
     }),
     DatabaseModule,
-    // Aquí importarás los módulos específicos para cada entidad,
-    // una vez que los crees (ej. UsuariosModule, RolesModule, etc.).
+    AuthModule,
+    RolesModule,
+    UsuariosModule,
+    ProfesionalesModule,
+    ServiciosModule,
+    ProfesionalServiciosModule,
+    CentrosDeSaludModule,
   ],
   controllers: [AppController],
   providers: [AppService],

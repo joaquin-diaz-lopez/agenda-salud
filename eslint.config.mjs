@@ -35,6 +35,15 @@ export default tseslint.config(
           endOfLine: 'auto',
         },
       ],
+      // REGLA PARA IGNORAR VARIABLES NO USADAS ---
+      '@typescript-eslint/no-unused-vars': [
+        'warn', // Puedes cambiar a "error" si prefieres que sea un error
+        {
+          argsIgnorePattern: '^_', // Ignora argumentos que empiezan con _
+          varsIgnorePattern: '^_', // Ignora variables que empiezan con _
+          caughtErrorsIgnorePattern: '^_', // Ignora errores capturados que empiezan con _
+        },
+      ],
     },
   },
 );

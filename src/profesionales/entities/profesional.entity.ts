@@ -12,6 +12,7 @@ import { Usuario } from '../../usuarios/entities/usuario.entity';
 import { CentroDeSalud } from '../../centros-de-salud/entities/centro-de-salud.entity';
 import { AgendaProfesional } from '../../agendas/entities/agenda-profesional.entity'; // Se definirá
 import { Cita } from '../../citas/entities/cita.entity'; // Se definirá
+import { ProfesionalServicio } from 'src/profesional-servicios/entities/profesional-servicio.entity';
 
 @Entity('profesionales')
 export class Profesional {
@@ -23,6 +24,7 @@ export class Profesional {
 
   @OneToOne(() => Usuario, (usuario) => usuario.profesional, {
     nullable: false,
+    eager: true,
     onDelete: 'CASCADE', // Si se borra el usuario, se borra el profesional
   })
   @JoinColumn({ name: 'id_usuario' })
@@ -55,6 +57,12 @@ export class Profesional {
 
   @OneToOne(() => AgendaProfesional, (agenda) => agenda.profesional)
   agenda: AgendaProfesional;
+
+  @OneToMany(
+    () => ProfesionalServicio,
+    (profesionalServicio) => profesionalServicio.profesional,
+  )
+  profesionalServicios: ProfesionalServicio[]; // Los servicios específicos que este profesional ofrece
 
   @OneToMany(() => Cita, (cita) => cita.profesional)
   citas: Cita[];

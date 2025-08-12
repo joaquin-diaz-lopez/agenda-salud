@@ -1,10 +1,26 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
+import { ValidationPipe } from '@nestjs/common';
+import * as express from 'express';
 
 async function bootstrap() {
   // Crea la instancia de la aplicación NestJS
   const app = await NestFactory.create(AppModule);
+
+  // --- ¡AÑADE ESTA LÍNEA PARA HABILITAR EL PARSEO DE JSON EXPLÍCITAMENTE! ---
+  app.use(express.json()); // Habilita el middleware para parsear cuerpos JSON
+  // --- FIN DE LA ADICIÓN ---
+
+  // --- ¡LÍNEA PARA HABILITAR EL VALIDATIONPIPE GLOBALMENTE! ---
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true, // Elimina propiedades que no están definidas en el DTO
+      forbidNonWhitelisted: true, // Lanza un error si hay propiedades no definidas
+      transform: true, // Transforma el payload a una instancia del DTO
+    }),
+  );
+  // --- FIN DE LA ADICIÓN ---
 
   // Obtén el servicio de configuración para acceder a las variables de entorno
   const configService = app.get(ConfigService);

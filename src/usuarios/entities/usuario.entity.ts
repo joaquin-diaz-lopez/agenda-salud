@@ -41,8 +41,8 @@ export class Usuario {
   @OneToOne(() => Profesional, (profesional) => profesional.usuario, {
     nullable: true,
   })
-  profesional: Profesional;
+  profesional: Profesional | null;
 
   @OneToOne(() => Paciente, (paciente) => paciente.usuario, { nullable: true })
-  paciente: Paciente;
+  paciente: Paciente | null;
 }

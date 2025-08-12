@@ -1,7 +1,7 @@
 // src/auth/jwt.strategy.ts
 import { Strategy, ExtractJwt } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtPayload } from './interfaces/jwt-payload.interface'; // Importa la interfaz JwtPayload
 
@@ -11,22 +11,25 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), // Extrae el token del encabezado Authorization: Bearer <token>
       ignoreExpiration: false, // No ignora la expiración del token
-      secretOrKey: configService.get<string>('JWT_SECRET'),
+      secretOrKey: configService.get<string>('JWT_SECRET')!, // Obtiene el secreto JWT de las variables de entorno
     });
   }
 
   /**
    * Valida el payload decodificado del JWT.
-   * @param payload La carga útil decodificada del token.
-   * @returns Un objeto que representa el usuario autenticado (se adjunta a req.user).
+   * Este método es llamado por Passport después de que el token JWT es extraído y verificado.
+   * @param payload La carga útil decodificada del token, tipada con JwtPayload.
+   * @returns Un objeto que representa el usuario autenticado. Este objeto se adjuntará a 'req.user' en los controladores.
+   * @throws UnauthorizedException si la validación falla (aunque el 'ignoreExpiration: false' ya maneja la expiración).
    */
-  async validate(payload: JwtPayload) {
-    // Tipado explícito del payload
+  validate(payload: JwtPayload) {
     // Aquí puedes realizar validaciones adicionales si es necesario,
-    // como verificar si el usuario todavía existe en la base de datos.
+    // por ejemplo, verificar si el usuario (payload.sub) todavía existe en la base de datos
+    // o si su rol ha cambiado desde que se emitió el token.
     // Para una implementación básica, simplemente retornamos los datos del payload.
 
-    // El objeto retornado aquí será adjuntado a 'req.user' en las rutas protegidas.
+    // El objeto retornado aquí será el que esté disponible en 'req.user'
+    // cuando se use el JwtAuthGuard en una ruta.
     return {
       id: payload.sub,
       nombreUsuario: payload.nombreUsuario,

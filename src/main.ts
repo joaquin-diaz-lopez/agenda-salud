@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import * as express from 'express';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   // Crea la instancia de la aplicación NestJS
@@ -27,6 +28,17 @@ async function bootstrap() {
 
   // Usa la variable de entorno 'PORT' o un valor por defecto (ej. 3000)
   const port = configService.get<number>('PORT') || 3000;
+
+  const config = new DocumentBuilder()
+    .setTitle('Agenda de Salud')
+    .setDescription('API de Agenda de Salud')
+    .setVersion('1.0')
+    .addTag('profesionales') // Opcional: añade tags para agrupar tus endpoints
+    .addBearerAuth() // Si usas JWT u otros tokens de portador
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document); // 'api' es la ruta donde se servirá la documentación (ej. http://localhost:3000/api)
 
   // Escucha en el puerto configurado
   await app.listen(port);

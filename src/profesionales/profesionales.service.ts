@@ -11,6 +11,7 @@ import { CreateProfesionalDto } from './dto/create-profesional.dto';
 import { UsuariosService } from '../usuarios/usuarios.service';
 import { CentroDeSalud } from '../centros-de-salud/entities/centro-de-salud.entity';
 import { Usuario } from '../usuarios/entities/usuario.entity';
+import { UpdateProfesionalDto } from './dto/update-profesional.dto';
 
 @Injectable()
 export class ProfesionalesService {
@@ -94,5 +95,81 @@ export class ProfesionalesService {
       where: { id },
       relations: ['usuario', 'centroDeSalud'],
     });
+  }
+
+  /**
+   * Actualiza parcialmente un profesional existente utilizando el método save().
+   * Realiza validaciones para asegurar la existencia del profesional y evitar conflictos de email.
+   * @param id El ID del profesional a actualizar.
+   * @param updateProfesionalDto El DTO con los datos parciales para actualizar.
+   * @returns El objeto Profesional actualizado.
+   * @throws NotFoundException Si el profesional no se encuentra.
+   * @throws ConflictException Si el email (si se actualiza) ya está en uso por otro profesional.
+   */
+  async actualiza(
+    id: string,
+    updateProfesionalDto: UpdateProfesionalDto,
+  ): Promise<Profesional> {
+    const profesionalToUpdate = await this.profesionalesRepository.findOne({
+      where: { id },
+      relations: ['usuario', 'centroDeSalud'],
+    });
+
+    if (!profesionalToUpdate) {
+      throw new NotFoundException(
+        `Profesional con ID '${id}' no encontrado para actualizar.`,
+      );
+    }
+
+    // Si se intenta actualizar el email, verificar que no esté ya en uso por otro profesional
+    // Verifica si el email está presente en el DTO de actualización Y es diferente al actual del profesional
+    if (
+      updateProfesionalDto.email &&
+      updateProfesionalDto.email !== profesionalToUpdate.email
+    ) {
+      const emailEnUso = await this.profesionalesRepository.findOne({
+        where: { email: updateProfesionalDto.email },
+      });
+      // Si se encuentra un profesional con ese email Y su ID es diferente al que estamos actualizando
+      if (emailEnUso && emailEnUso.id !== id) {
+        throw new ConflictException(
+          `El email '${updateProfesionalDto.email}' ya está en uso por otro profesional.`,
+        );
+      }
+    }
+
+    // Si se proporciona un nuevo idUsuario para la actualización
+    if (
+      updateProfesionalDto.idUsuario &&
+      updateProfesionalDto.idUsuario !== profesionalToUpdate.idUsuario
+    ) {
+      // Busca el nuevo usuario por su ID para asegurar su existencia y crear la relación
+      const nuevoUsuario = await this.usuariosService.buscarPorId(
+        updateProfesionalDto.idUsuario,
+      );
+      if (!nuevoUsuario) {
+        throw new NotFoundException(
+          `Usuario con ID '${updateProfesionalDto.idUsuario}' no encontrado.`,
+        );
+      }
+      // Verifica si el usuario ya está asociado a otro profesional (que no sea el actual que estamos modificando)
+      if (nuevoUsuario.profesional && nuevoUsuario.profesional.id !== id) {
+        throw new ConflictException(
+          `El usuario con ID '${updateProfesionalDto.idUsuario}' ya está asociado a otro profesional.`,
+        );
+      }
+
+      // Actualiza tanto la clave foránea (idUsuario) como la relación del objeto (usuario)
+      profesionalToUpdate.idUsuario = nuevoUsuario.id;
+      profesionalToUpdate.usuario = nuevoUsuario; // <-- Aquí TypeORM detecta el cambio de relación
+    }
+
+    // Aplica las actualizaciones parciales a las propiedades primitivas de la entidad cargada.
+    // Usa Object.assign, excluyendo `idUsuario` ya que lo maneja explícitamente arriba.
+    const { idUsuario: _, ...restOfUpdateDto } = updateProfesionalDto; // Desestructura para excluir idUsuario
+    Object.assign(profesionalToUpdate, restOfUpdateDto);
+
+    // TypeORM detecta los cambios y solo actualiza las columnas modificadas.
+    return this.profesionalesRepository.save(profesionalToUpdate);
   }
 }

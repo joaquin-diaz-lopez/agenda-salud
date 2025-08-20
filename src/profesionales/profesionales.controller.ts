@@ -4,12 +4,14 @@ import {
   Post,
   Body,
   Get,
+  Patch,
   Param,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
 import { ProfesionalesService } from './profesionales.service'; // Importa el servicio de Profesionales
 import { CreateProfesionalDto } from './dto/create-profesional.dto'; // Importa el DTO de creación de profesional
+import { UpdateProfesionalDto } from './dto/update-profesional.dto';
 import { Profesional } from './entities/profesional.entity'; // Importa la entidad Profesional
 
 /**
@@ -56,5 +58,16 @@ export class ProfesionalesController {
   @HttpCode(HttpStatus.OK) // Retorna un estado 200 OK
   async findOne(@Param('id') id: string): Promise<Profesional | null> {
     return this.profesionalesService.findOne(id);
+  }
+
+  @Patch(':id')
+  async actualiza(
+    @Param('id') id: string,
+    @Body() actualizaProfesionalDto: UpdateProfesionalDto,
+  ) {
+    return await this.profesionalesService.actualiza(
+      id,
+      actualizaProfesionalDto,
+    );
   }
 }

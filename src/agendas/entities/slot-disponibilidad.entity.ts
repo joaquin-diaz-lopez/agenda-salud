@@ -47,13 +47,12 @@ export class SlotDisponibilidad {
   estaBloqueado: boolean; // ¿Está este slot bloqueado (por descanso, gestión, etc.)?
 
   @OneToOne(() => Cita, (cita) => cita.slotDisponibilidad, { nullable: true })
-  @JoinColumn({ name: 'id_cita' }) // Para la relación OneToOne de cita a slot
-  cita: Cita;
+  cita: Cita | null;
 
   @ManyToOne(() => Descanso, (descanso) => descanso.slots, {
     nullable: true,
     onDelete: 'SET NULL',
   })
   @JoinColumn({ name: 'id_descanso' })
-  descanso: Descanso; // Si este slot es parte de un descanso
+  descanso: Descanso | null;
 }

@@ -1,13 +1,13 @@
 // src/profesionales/profesionales.module.ts
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProfesionalesService } from './profesionales.service';
 import { ProfesionalesController } from './profesionales.controller';
 import { Profesional } from './entities/profesional.entity'; // Importa la entidad Profesional
 import { UsuariosModule } from '../usuarios/usuarios.module'; // Importa UsuariosModule
 import { CentroDeSalud } from '../centros-de-salud/entities/centro-de-salud.entity'; // Importa la entidad CentroDeSalud
-// Si ya tiene un módulo para CentroDeSalud con un servicio findAll/findOne, descomente lo siguiente:
-// import { CentrosDeSaludModule } from '../centros-de-salud/centros-de-salud.module';
+import { ProfesionalServiciosModule } from 'src/profesional-servicios/profesional-servicios.module';
+import { CentrosDeSaludModule } from '../centros-de-salud/centros-de-salud.module';
 
 /**
  * Módulo para la gestión de Profesionales.
@@ -18,7 +18,8 @@ import { CentroDeSalud } from '../centros-de-salud/entities/centro-de-salud.enti
   imports: [
     TypeOrmModule.forFeature([Profesional, CentroDeSalud]), // Registra Profesional y CentroDeSalud para sus repositorios
     UsuariosModule, // Necesario porque ProfesionalesService inyecta UsuariosService
-    // CentrosDeSaludModule, // Si el servicio de profesionales usa un servicio de CentrosDeSalud, importe aquí
+    CentrosDeSaludModule, // Si el servicio de profesionales usa un servicio de CentrosDeSalud, importe aquí
+    forwardRef(() => ProfesionalServiciosModule),
   ],
   providers: [ProfesionalesService], // Registra ProfesionalesService como proveedor
   controllers: [ProfesionalesController], // Registra ProfesionalesController como controlador

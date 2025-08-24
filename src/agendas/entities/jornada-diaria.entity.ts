@@ -6,12 +6,14 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
+  Unique,
 } from 'typeorm';
 import { AgendaProfesional } from './agenda-profesional.entity';
 import { SlotDisponibilidad } from './slot-disponibilidad.entity';
 import { Descanso } from './descanso.entity';
 
 @Entity('jornadas_diarias')
+@Unique(['idAgendaProfesional', 'fecha'])
 export class JornadaDiaria {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -26,7 +28,7 @@ export class JornadaDiaria {
   @JoinColumn({ name: 'id_agenda_profesional' })
   agendaProfesional: AgendaProfesional;
 
-  @Column({ type: 'date', nullable: false, unique: true }) // Una jornada por profesional por día
+  @Column({ type: 'timestamp with time zone', nullable: false })
   fecha: Date;
 
   @Column({ type: 'time', nullable: false, name: 'hora_inicio_trabajo' })

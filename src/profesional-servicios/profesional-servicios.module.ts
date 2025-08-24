@@ -1,5 +1,5 @@
 // src/profesional-servicios/profesional-servicios.module.ts
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common'; // <-- ¡Importar forwardRef!
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProfesionalServiciosService } from './profesional-servicios.service';
 import { ProfesionalServiciosController } from './profesional-servicios.controller';
@@ -14,7 +14,8 @@ import { ServiciosModule } from '../servicios/servicios.module'; // Importa el m
 @Module({
   imports: [
     TypeOrmModule.forFeature([ProfesionalServicio]), // Registra la entidad ProfesionalServicio
-    ProfesionalesModule, // Necesario para que ProfesionalServiciosService pueda usar ProfesionalesService
+    forwardRef(() => ProfesionalesModule), // <-- ¡Ajuste para dependencia circular!
+    // Necesario para que ProfesionalServiciosService pueda usar ProfesionalesService
     ServiciosModule, // Necesario para que ProfesionalServiciosService pueda usar ServiciosService
   ],
   providers: [ProfesionalServiciosService],

@@ -3,6 +3,8 @@ import {
   Injectable,
   ConflictException,
   NotFoundException,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -12,6 +14,7 @@ import { UsuariosService } from '../usuarios/usuarios.service';
 import { CentroDeSalud } from '../centros-de-salud/entities/centro-de-salud.entity';
 import { Usuario } from '../usuarios/entities/usuario.entity';
 import { UpdateProfesionalDto } from './dto/update-profesional.dto';
+import { ProfesionalServiciosService } from '../profesional-servicios/profesional-servicios.service'; // ¡NUEVO!
 
 @Injectable()
 export class ProfesionalesService {
@@ -21,6 +24,8 @@ export class ProfesionalesService {
     private usuariosService: UsuariosService,
     @InjectRepository(CentroDeSalud)
     private centroDeSaludRepository: Repository<CentroDeSalud>,
+    @Inject(forwardRef(() => ProfesionalServiciosService))
+    private profesionalServiciosService: ProfesionalServiciosService,
   ) {}
 
   async create(
@@ -171,5 +176,24 @@ export class ProfesionalesService {
 
     // TypeORM detecta los cambios y solo actualiza las columnas modificadas.
     return this.profesionalesRepository.save(profesionalToUpdate);
+  }
+
+  /**
+   * Verifica si un profesional específico ofrece un servicio particular.
+   * @param idProfesional El ID del profesional.
+   * @param idServicio El ID del servicio.
+   * @returns true si el profesional ofrece el servicio, false en caso contrario.
+   */
+  async profesionalOfreceServicio(
+    idProfesional: string,
+    idServicio: string,
+  ): Promise<boolean> {
+    // Asume que ProfesionalServiciosService tiene un método para buscar por ambos IDs
+    const asociacion =
+      await this.profesionalServiciosService.findByProfesionalAndServicio(
+        idProfesional,
+        idServicio,
+      ); // ¡Asume este método!
+    return !!asociacion; // Devuelve true si la asociación existe, false si es null/undefined
   }
 }

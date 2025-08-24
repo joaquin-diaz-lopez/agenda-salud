@@ -93,4 +93,14 @@ export class UsuariosService {
   }
 
   // Puedes añadir otros métodos CRUD aquí (findAll, findOne, update, remove)
+
+  /**
+   * Guarda una instancia de Usuario.
+   * Útil para actualizar la entidad Usuario después de modificar sus relaciones (ej. paciente o profesional).
+   * @param usuario La entidad Usuario a guardar.
+   * @returns La entidad Usuario guardada.
+   */
+  async saveUsuario(usuario: Usuario): Promise<Usuario> {
+    return this.usuariosRepository.save(usuario);
+  }
 }

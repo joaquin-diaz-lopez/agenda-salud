@@ -10,6 +10,9 @@ import { ServiciosModule } from './servicios/servicios.module';
 import { ProfesionalServiciosModule } from './profesional-servicios/profesional-servicios.module';
 import { ProfesionalesModule } from './profesionales/profesionales.module';
 import { CentrosDeSaludModule } from './centros-de-salud/centros-de-salud.module';
+import { PacientesModule } from './pacientes/pacientes.module';
+import { CitasModule } from './citas/citas.module';
+import { AgendasModule } from './agendas/agendas.module';
 
 @Module({
   imports: [
@@ -24,6 +27,9 @@ import { CentrosDeSaludModule } from './centros-de-salud/centros-de-salud.module
     ServiciosModule,
     ProfesionalServiciosModule,
     CentrosDeSaludModule,
+    PacientesModule,
+    CitasModule,
+    AgendasModule,
   ],
   controllers: [AppController],
   providers: [AppService],

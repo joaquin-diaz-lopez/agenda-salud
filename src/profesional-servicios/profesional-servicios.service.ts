@@ -3,6 +3,8 @@ import {
   Injectable,
   ConflictException,
   NotFoundException,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -20,8 +22,9 @@ export class ProfesionalServiciosService {
   constructor(
     @InjectRepository(ProfesionalServicio)
     private profesionalServiciosRepository: Repository<ProfesionalServicio>,
-    private profesionalesService: ProfesionalesService, // Inyecta el servicio de profesionales
     private serviciosService: ServiciosService, // Inyecta el servicio de servicios
+    @Inject(forwardRef(() => ProfesionalesService))
+    private profesionalesService: ProfesionalesService,
   ) {}
 
   /**
@@ -95,6 +98,20 @@ export class ProfesionalServiciosService {
     return this.profesionalServiciosRepository.findOne({
       where: { id },
       relations: ['profesional', 'servicio'],
+    });
+  }
+  /**
+   * Busca una asociación Profesional-Servicio por el ID del profesional y el ID del servicio.
+   * @param idProfesional El ID del profesional.
+   * @param idServicio El ID del servicio.
+   * @returns La asociación ProfesionalServicio si se encuentra, o null.
+   */
+  async findByProfesionalAndServicio(
+    idProfesional: string,
+    idServicio: string,
+  ): Promise<ProfesionalServicio | null> {
+    return this.profesionalServiciosRepository.findOne({
+      where: { idProfesional, idServicio },
     });
   }
 }

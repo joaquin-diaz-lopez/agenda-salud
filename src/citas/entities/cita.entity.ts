@@ -37,7 +37,6 @@ export class Cita {
   @JoinColumn({ name: 'id_profesional' })
   profesional: Profesional;
 
-  // --- ¡NUEVA RELACIÓN CON SERVICIO! ---
   @Column({ name: 'id_servicio', type: 'uuid', nullable: false })
   idServicio: string; // Columna para la clave foránea del servicio
 
@@ -47,7 +46,6 @@ export class Cita {
   })
   @JoinColumn({ name: 'id_servicio' }) // Especifica la columna de la clave foránea
   servicio: Servicio;
-  // --- FIN NUEVA RELACIÓN ---
 
   @Column({
     name: 'id_slot_disponibilidad',

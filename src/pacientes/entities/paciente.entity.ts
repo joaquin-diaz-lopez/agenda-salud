@@ -17,14 +17,14 @@ export class Paciente {
   id: string;
 
   @Column({ name: 'id_usuario', type: 'uuid', unique: true, nullable: true }) // Puede o no tener usuario
-  idUsuario: string;
+  idUsuario: string | null;
 
   @OneToOne(() => Usuario, (usuario) => usuario.paciente, {
     nullable: true,
     onDelete: 'SET NULL', // Si se borra el usuario, el paciente puede existir sin cuenta
   })
   @JoinColumn({ name: 'id_usuario' })
-  usuario: Usuario;
+  usuario: Usuario | null;
 
   @Column({ nullable: false, length: 100, name: 'nombre' })
   nombre: string;

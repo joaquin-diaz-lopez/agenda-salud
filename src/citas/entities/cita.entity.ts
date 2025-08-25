@@ -10,7 +10,7 @@ import {
 import { Paciente } from '../../pacientes/entities/paciente.entity';
 import { Profesional } from '../../profesionales/entities/profesional.entity';
 import { SlotDisponibilidad } from '../../agendas/entities/slot-disponibilidad.entity';
-import { Servicio } from 'src/servicios/entities/servicio.entity';
+import { Servicio } from '../../servicios/entities/servicio.entity';
 
 @Entity('citas')
 export class Cita {

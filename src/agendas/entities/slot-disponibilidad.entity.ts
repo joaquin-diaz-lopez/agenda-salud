@@ -46,7 +46,10 @@ export class SlotDisponibilidad {
   @Column({ type: 'boolean', default: false, name: 'esta_bloqueado' })
   estaBloqueado: boolean; // ¿Está este slot bloqueado (por descanso, gestión, etc.)?
 
-  @OneToOne(() => Cita, (cita) => cita.slotDisponibilidad, { nullable: true })
+  @OneToOne(() => Cita, (cita) => cita.slotDisponibilidad, {
+    nullable: true,
+    eager: true,
+  })
   cita: Cita | null;
 
   @ManyToOne(() => Descanso, (descanso) => descanso.slots, {

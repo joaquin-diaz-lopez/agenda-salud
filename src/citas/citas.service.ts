@@ -7,15 +7,16 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Cita } from './entities/cita.entity'; // Importa la entidad Cita
-import { CreateCitaDto } from './dto/create-cita.dto'; // Importa el DTO de creación de Cita
-import { UpdateCitaDto } from './dto/update-cita.dto'; // Importa el DTO de actualización de Cita
+import { Cita } from './entities/cita.entity';
+import { CreateCitaDto } from './dto/create-cita.dto';
+import { UpdateCitaDto } from './dto/update-cita.dto';
 
-import { PacientesService } from '../pacientes/pacientes.service'; // Servicio para validar Paciente
-import { ProfesionalesService } from '../profesionales/profesionales.service'; // Servicio para validar Profesional
-import { ServiciosService } from '../servicios/servicios.service'; // Servicio para validar Servicio
+import { PacientesService } from '../pacientes/pacientes.service';
+import { ProfesionalesService } from '../profesionales/profesionales.service';
+import { ServiciosService } from '../servicios/servicios.service';
 
-import { SlotDisponibilidadService } from '../agendas/slot-disponibilidad.service'; // Servicio para validar y gestionar SlotDisponibilidad
+import { SlotDisponibilidadService } from '../agendas/slot-disponibilidad.service';
+import { SlotDisponibilidad } from '../agendas/entities/slot-disponibilidad.entity'; // Importa la entidad SlotDisponibilidad
 
 /**
  * Servicio para la gestión de Citas.
@@ -26,12 +27,12 @@ import { SlotDisponibilidadService } from '../agendas/slot-disponibilidad.servic
 @Injectable()
 export class CitasService {
   constructor(
-    @InjectRepository(Cita) // Inyecta el repositorio de TypeORM para la entidad Cita
+    @InjectRepository(Cita)
     private citasRepository: Repository<Cita>,
-    private pacientesService: PacientesService, // Inyecta PacientesService
-    private profesionalesService: ProfesionalesService, // Inyecta ProfesionalesService
-    private serviciosService: ServiciosService, // Inyecta ServiciosService
-    private slotDisponibilidadService: SlotDisponibilidadService, // Inyecta SlotDisponibilidadService
+    private pacientesService: PacientesService,
+    private profesionalesService: ProfesionalesService,
+    private serviciosService: ServiciosService,
+    private slotDisponibilidadService: SlotDisponibilidadService,
   ) {}
 
   /**
@@ -92,15 +93,15 @@ export class CitasService {
     }
 
     // 5. Validar existencia y disponibilidad del SlotDisponibilidad
-    const slotDisponibilidad =
+    const slotDisponibilidad: SlotDisponibilidad | null =
       await this.slotDisponibilidadService.findOne(idSlotDisponibilidad);
     if (!slotDisponibilidad) {
       throw new NotFoundException(
         `Slot de Disponibilidad con ID '${idSlotDisponibilidad}' no encontrado.`,
       );
     }
-    if (slotDisponibilidad.cita) {
-      // Si el slot ya tiene una cita asociada
+
+    if (slotDisponibilidad.estaReservado) {
       throw new ConflictException(
         `El Slot de Disponibilidad con ID '${idSlotDisponibilidad}' ya está reservado.`,
       );
@@ -116,21 +117,44 @@ export class CitasService {
       idServicio: servicio.id,
       slotDisponibilidad,
       idSlotDisponibilidad: slotDisponibilidad.id,
-      horaInicio: slotDisponibilidad.horaInicio, // Derivar de SlotDisponibilidad
-      horaFin: slotDisponibilidad.horaFin, // Derivar de SlotDisponibilidad
+      horaInicio: slotDisponibilidad.horaInicio,
+      horaFin: slotDisponibilidad.horaFin,
       tipo,
       notas,
-      // El campo 'estado' se establecerá automáticamente a 'Programada' por el valor por defecto en la entidad Cita.
+      // idEstadoCita se establecerá por defecto si su entidad Cita tiene un default.
+      // Si necesita un estado específico (ej. "Programada") y no hay default,
+      // debería buscar el ID de ese estado y asignarlo aquí.
     });
 
     // 7. Guardar la nueva cita en la base de datos
     const citaGuardada = await this.citasRepository.save(nuevaCita);
 
-    // 8. Actualizar el SlotDisponibilidad para marcarlo como reservado
-    slotDisponibilidad.cita = citaGuardada; // Asociar la cita al slot
-    await this.slotDisponibilidadService.save(slotDisponibilidad); // Guardar el slot actualizado
+    // 8. Actualizar el SlotDisponibilidad para marcarlo como reservado y asociar la cita
+    slotDisponibilidad.cita = citaGuardada;
+    slotDisponibilidad.estaReservado = true;
+    await this.slotDisponibilidadService.save(slotDisponibilidad);
 
-    return citaGuardada;
+    // 9. --- ¡PASO DE CORRECCIÓN CLAVE: RECARGAR LA CITA PARA OBTENER EL ESTADO MÁS ACTUALIZADO! ---
+    const citaFinal = await this.citasRepository.findOne({
+      where: { id: citaGuardada.id },
+      relations: [
+        'paciente',
+        'profesional',
+        'servicio',
+        'slotDisponibilidad',
+        'slotDisponibilidad.cita',
+      ],
+      // Aseguramos cargar todas las relaciones, incluyendo la inversa en slotDisponibilidad.cita
+    });
+
+    if (!citaFinal) {
+      // Esto no debería pasar si la cita se guardó
+      throw new NotFoundException(
+        `Cita con ID '${citaGuardada.id}' no encontrada después de la creación.`,
+      );
+    }
+    return citaFinal;
+    // --- FIN PASO DE CORRECCIÓN CLAVE ---
   }
 
   /**
@@ -140,7 +164,13 @@ export class CitasService {
    */
   async findAll(): Promise<Cita[]> {
     return this.citasRepository.find({
-      relations: ['paciente', 'profesional', 'servicio', 'slotDisponibilidad'],
+      relations: [
+        'paciente',
+        'profesional',
+        'servicio',
+        'slotDisponibilidad',
+        'slotDisponibilidad.cita',
+      ], // Cargar la inversa
     });
   }
 
@@ -148,12 +178,18 @@ export class CitasService {
    * Busca una cita por su ID único.
    * Carga las relaciones paciente, profesional, servicio, slotDisponibilidad.
    * @param id El ID (UUID) de la cita a buscar.
-   * @returns Una promesa que resuelve al objeto Cita si se encuentra, o null si no.
+   * @returns Una promesa que resuelve al objeto Cita si se encuentra, o null.
    */
   async findOne(id: string): Promise<Cita | null> {
     return this.citasRepository.findOne({
       where: { id },
-      relations: ['paciente', 'profesional', 'servicio', 'slotDisponibilidad'],
+      relations: [
+        'paciente',
+        'profesional',
+        'servicio',
+        'slotDisponibilidad',
+        'slotDisponibilidad.cita',
+      ], // Cargar la inversa
     });
   }
 
@@ -169,10 +205,15 @@ export class CitasService {
    * @throws BadRequestException Si el servicio no es ofrecido por el profesional (si se cambia).
    */
   async actualiza(id: string, updateCitaDto: UpdateCitaDto): Promise<Cita> {
-    // 1. Verificar si la cita existe y recuperarla
     const citaToUpdate = await this.citasRepository.findOne({
       where: { id },
-      relations: ['paciente', 'profesional', 'servicio', 'slotDisponibilidad'],
+      relations: [
+        'paciente',
+        'profesional',
+        'servicio',
+        'slotDisponibilidad',
+        'slotDisponibilidad.cita',
+      ],
     });
 
     if (!citaToUpdate) {
@@ -181,8 +222,6 @@ export class CitasService {
       );
     }
 
-    // 2. Manejo de actualización de relaciones y claves foráneas
-    // Para idPaciente
     if (
       updateCitaDto.idPaciente &&
       updateCitaDto.idPaciente !== citaToUpdate.idPaciente
@@ -198,7 +237,6 @@ export class CitasService {
       citaToUpdate.idPaciente = nuevoPaciente.id;
     }
 
-    // Para idProfesional
     if (
       updateCitaDto.idProfesional &&
       updateCitaDto.idProfesional !== citaToUpdate.idProfesional
@@ -214,7 +252,6 @@ export class CitasService {
       citaToUpdate.idProfesional = nuevoProfesional.id;
     }
 
-    // Para idServicio
     if (
       updateCitaDto.idServicio &&
       updateCitaDto.idServicio !== citaToUpdate.idServicio
@@ -246,7 +283,6 @@ export class CitasService {
       citaToUpdate.idServicio = nuevoServicio.id;
     }
 
-    // Para idSlotDisponibilidad
     if (
       updateCitaDto.idSlotDisponibilidad &&
       updateCitaDto.idSlotDisponibilidad !== citaToUpdate.idSlotDisponibilidad
@@ -258,36 +294,32 @@ export class CitasService {
         throw new NotFoundException(
           `Nuevo Slot de Disponibilidad con ID '${updateCitaDto.idSlotDisponibilidad}' no encontrado.`,
         );
-      if (nuevoSlot.cita && nuevoSlot.cita.id !== id) {
+      if (nuevoSlot.estaReservado && nuevoSlot.cita?.id !== id) {
         throw new ConflictException(
           `El Slot de Disponibilidad con ID '${updateCitaDto.idSlotDisponibilidad}' ya está reservado por otra cita.`,
         );
       }
-      // Liberar el slot antiguo si se cambia de slot
+
       if (
         citaToUpdate.slotDisponibilidad &&
         citaToUpdate.slotDisponibilidad.id !== nuevoSlot.id
       ) {
+        citaToUpdate.slotDisponibilidad.estaReservado = false;
         citaToUpdate.slotDisponibilidad.cita = null;
         await this.slotDisponibilidadService.save(
           citaToUpdate.slotDisponibilidad,
         );
       }
+
       citaToUpdate.slotDisponibilidad = nuevoSlot;
       citaToUpdate.idSlotDisponibilidad = nuevoSlot.id;
       citaToUpdate.horaInicio = nuevoSlot.horaInicio;
       citaToUpdate.horaFin = nuevoSlot.horaFin;
-      // Marcar el nuevo slot como reservado
+      nuevoSlot.estaReservado = true;
       nuevoSlot.cita = citaToUpdate;
       await this.slotDisponibilidadService.save(nuevoSlot);
     }
 
-    // El campo 'estado' es una columna primitiva en la entidad, no se espera en el DTO para actualizaciones.
-    // Si se quisiera actualizar el estado, se haría a través de un método específico o se añadiría al DTO.
-    // updateCitaDto.estado no existe, por lo tanto, se omite cualquier referencia.
-
-    // 3. Aplicar las actualizaciones parciales a las propiedades primitivas de la entidad
-    // Excluímos los IDs de relaciones ya que los manejamos explícitamente arriba, y 'estado' porque no está en el DTO.
     const {
       idPaciente: _,
       idProfesional: __,
@@ -297,9 +329,25 @@ export class CitasService {
     } = updateCitaDto;
     Object.assign(citaToUpdate, restOfUpdateDto);
 
-    // 4. Guardar la entidad actualizada en la base de datos.
-    return this.citasRepository.save(citaToUpdate);
-  }
+    const updatedCita = await this.citasRepository.save(citaToUpdate);
 
-  // Puedes añadir otros métodos como `remove` si los necesitas más adelante.
+    // Recargar la cita final para asegurar todas las relaciones actualizadas en la respuesta
+    const citaFinal = await this.citasRepository.findOne({
+      where: { id: updatedCita.id },
+      relations: [
+        'paciente',
+        'profesional',
+        'servicio',
+        'slotDisponibilidad',
+        'slotDisponibilidad.cita',
+      ],
+    });
+
+    if (!citaFinal) {
+      throw new NotFoundException(
+        `Cita con ID '${updatedCita.id}' no encontrada después de la actualización.`,
+      );
+    }
+    return citaFinal;
+  }
 }

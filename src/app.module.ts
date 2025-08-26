@@ -13,6 +13,7 @@ import { CentrosDeSaludModule } from './centros-de-salud/centros-de-salud.module
 import { PacientesModule } from './pacientes/pacientes.module';
 import { CitasModule } from './citas/citas.module';
 import { AgendasModule } from './agendas/agendas.module';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { AgendasModule } from './agendas/agendas.module';
     PacientesModule,
     CitasModule,
     AgendasModule,
+    CommonModule,
   ],
   controllers: [AppController],
   providers: [AppService],

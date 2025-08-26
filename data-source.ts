@@ -1,3 +1,4 @@
+// data-source.ts (en la raíz del proyecto)
 import { DataSource } from 'typeorm';
 import { config } from 'dotenv';
 import * as path from 'path';
@@ -12,9 +13,15 @@ const AppDataSource = new DataSource({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
   schema: process.env.DB_SCHEMA,
-  entities: [__dirname + '/src/**/*.entity{.ts,.js}'],
-  migrations: [path.join(__dirname, 'src/migrations/*.{ts,js}')],
-  synchronize: false, // Siempre false para migraciones
+
+  // --- ¡CORRECCIÓN CLAVE AQUÍ: USAR process.cwd() PARA RUTAS ABSOLUTAS! ---
+  // Las entidades compiladas estarán en `dist/**/*.entity.js`
+  entities: [path.join(process.cwd(), 'dist', '**', '*.entity{.ts,.js}')],
+  // Las migraciones compiladas estarán en `dist/src/migrations/*.js`
+  migrations: [path.join(process.cwd(), 'dist', 'src', 'migrations', '*.js')],
+  // --- FIN CORRECCIÓN ---
+
+  synchronize: false, // Siempre false para migraciones en producción
   logging: true,
   ssl:
     process.env.DB_SSL_MODE === 'require'

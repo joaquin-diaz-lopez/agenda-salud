@@ -1,13 +1,21 @@
 // src/roles/dto/create-rol.dto.ts
-import { IsString, IsNotEmpty, MaxLength } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsString, IsNotEmpty } from 'class-validator';
 
 export class CreateRolDto {
   @IsString()
   @IsNotEmpty()
-  @MaxLength(50)
+  @ApiProperty({
+    example: 'Administrador',
+    description: 'Nombre único del rol.',
+  })
   nombre: string;
 
   @IsString()
-  @MaxLength(255)
+  @IsNotEmpty()
+  @ApiProperty({
+    example: 'Control total del sistema',
+    description: 'Descripción detallada de las responsabilidades del rol.',
+  })
   descripcion: string;
 }

@@ -6,18 +6,19 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Servicio } from './entities/servicio.entity'; // Importa la entidad Servicio
-import { CreateServicioDto } from './dto/create-servicio.dto'; // Importa el DTO de creación
+import { Servicio } from './entities/servicio.entity';
+import { CreateServicioDto } from './dto/create-servicio.dto';
+import { UpdateServicioDto } from './dto/update-servicio.dto';
 
 /**
  * Servicio para la gestión de Servicios.
  * Provee métodos para interactuar con la entidad Servicio en la base de datos,
- * como la creación de nuevos servicios.
+ * como la creación, lectura, actualización y eliminación.
  */
 @Injectable()
 export class ServiciosService {
   constructor(
-    @InjectRepository(Servicio) // Inyecta el repositorio de TypeORM para la entidad Servicio
+    @InjectRepository(Servicio)
     private serviciosRepository: Repository<Servicio>,
   ) {}
 
@@ -29,7 +30,6 @@ export class ServiciosService {
    * @throws ConflictException Si ya existe un servicio con el nombre proporcionado.
    */
   async create(createServicioDto: CreateServicioDto): Promise<Servicio> {
-    // 1. Verificar si ya existe un servicio con el mismo nombre
     const servicioExistente = await this.serviciosRepository.findOne({
       where: { nombre: createServicioDto.nombre },
     });
@@ -40,10 +40,7 @@ export class ServiciosService {
       );
     }
 
-    // 2. Crear una nueva instancia de la entidad Servicio con los datos del DTO
     const nuevoServicio = this.serviciosRepository.create(createServicioDto);
-
-    // 3. Guardar el nuevo servicio en la base de datos
     return this.serviciosRepository.save(nuevoServicio);
   }
 
@@ -58,11 +55,42 @@ export class ServiciosService {
   /**
    * Busca un servicio por su ID único.
    * @param id El ID (UUID) del servicio a buscar.
-   * @returns Una promesa que resuelve al objeto Servicio si se encuentra, o null si no.
+   * @returns Una promesa que resuelve al objeto Servicio si se encuentra.
+   * @throws NotFoundException Si no se encuentra un servicio con el ID proporcionado.
    */
-  async findOne(id: string): Promise<Servicio | null> {
-    return this.serviciosRepository.findOne({ where: { id } });
+  async findOne(id: string): Promise<Servicio> {
+    const servicio = await this.serviciosRepository.findOne({ where: { id } });
+    if (!servicio) {
+      throw new NotFoundException(`Servicio con UUID "${id}" no encontrado.`);
+    }
+    return servicio;
   }
 
-  // Puedes añadir aquí otros métodos como `update` o `remove` si los necesitas más adelante.
+  /**
+   * Actualiza un servicio existente por su ID.
+   * @param id El ID (UUID) del servicio a actualizar.
+   * @param updateServicioDto El DTO con los datos para la actualización.
+   * @returns El objeto Servicio actualizado.
+   * @throws NotFoundException Si no se encuentra un servicio con el ID proporcionado.
+   */
+  async update(
+    id: string,
+    updateServicioDto: UpdateServicioDto,
+  ): Promise<Servicio> {
+    const servicio = await this.findOne(id);
+    this.serviciosRepository.merge(servicio, updateServicioDto);
+    return this.serviciosRepository.save(servicio);
+  }
+
+  /**
+   * Elimina un servicio por su ID.
+   * @param id El ID (UUID) del servicio a eliminar.
+   * @throws NotFoundException Si no se encuentra un servicio con el ID proporcionado.
+   */
+  async remove(id: string): Promise<void> {
+    const resultado = await this.serviciosRepository.delete(id);
+    if (resultado.affected === 0) {
+      throw new NotFoundException(`Servicio con UUID "${id}" no encontrado.`);
+    }
+  }
 }

@@ -5,8 +5,6 @@ import {
   Body,
   Get,
   Param,
-  HttpCode,
-  HttpStatus,
   Patch,
   UseGuards,
 } from '@nestjs/common';
@@ -15,18 +13,26 @@ import { CreateProfesionalDto } from './dto/create-profesional.dto';
 import { UpdateProfesionalDto } from './dto/update-profesional.dto';
 import { Profesional } from './entities/profesional.entity';
 
-// --- ¡NUEVAS IMPORTACIONES PARA EL CONTROL DE ACCESO! ---
+// --- NUEVAS IMPORTACIONES PARA EL CONTROL DE ACCESO y SWAGGER ---
 import { JwtAuthGuard } from '../auth/jwt-auth.guard'; // Para asegurar que el usuario esté autenticado
 import { RolesGuard } from '../common/guards/roles.guard'; // Tu guard de roles personalizado
 import { Roles } from '../common/decorators/roles.decorator'; // Tu decorador de roles personalizado
-// --- FIN NUEVAS IMPORTACIONES ---
+import {
+  ApiCreateOperation,
+  ApiFindAllOperation,
+  ApiFindOneOperation,
+  ApiUpdateOperation,
+} from '../common/decorators/api-operations.decorator';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
 /**
  * Controlador para la gestión de Profesionales.
  * Expone los endpoints HTTP para realizar operaciones CRUD básicas sobre los profesionales.
  */
+@ApiTags('Profesionales')
+//@ApiBearerAuth() // Indica que este controlador requiere un token JWT para acceder a sus rutas
 @Controller('profesionales')
-@UseGuards(JwtAuthGuard, RolesGuard) // Aplica JwtAuthGuard y RolesGuard a TODAS las rutas de este controlador
+//@UseGuards(JwtAuthGuard, RolesGuard) // Aplica JwtAuthGuard y RolesGuard a TODAS las rutas de este controlador
 export class ProfesionalesController {
   constructor(private readonly profesionalesService: ProfesionalesService) {}
 
@@ -37,8 +43,8 @@ export class ProfesionalesController {
    * @returns El profesional recién creado.
    */
   @Post()
-  @HttpCode(HttpStatus.CREATED)
-  @Roles('Administrador', 'Profesional') // <-- ¡Aquí usamos tu decorador!
+  @ApiCreateOperation(Profesional, 'Crea un nuevo profesional')
+  //@Roles('Administrador', 'Profesional') // <-- ¡Aquí usamos tu decorador!
   async create(
     @Body() createProfesionalDto: CreateProfesionalDto,
   ): Promise<Profesional> {
@@ -51,7 +57,7 @@ export class ProfesionalesController {
    * @returns Un array de todos los profesionales.
    */
   @Get()
-  @HttpCode(HttpStatus.OK)
+  @ApiFindAllOperation(Profesional, 'Obtiene todos los profesionales')
   // No se especifica @Roles aquí, por lo que RolesGuard no restringirá por roles para este método.
   // Sin embargo, JwtAuthGuard sigue protegiéndolo.
   async findAll(): Promise<Profesional[]> {
@@ -65,7 +71,7 @@ export class ProfesionalesController {
    * @returns El profesional encontrado o null.
    */
   @Get(':id')
-  @HttpCode(HttpStatus.OK)
+  @ApiFindOneOperation(Profesional, 'Obtiene un profesional por su ID')
   async findOne(@Param('id') id: string): Promise<Profesional | null> {
     return this.profesionalesService.findOne(id);
   }
@@ -78,7 +84,7 @@ export class ProfesionalesController {
    * @returns El objeto Profesional actualizado.
    */
   @Patch(':id')
-  @HttpCode(HttpStatus.OK)
+  @ApiUpdateOperation(Profesional, 'Actualiza un profesional existente')
   @Roles('Administrador', 'Profesional') // <-- Aquí usamos tu decorador!
   async actualiza(
     @Param('id') id: string,

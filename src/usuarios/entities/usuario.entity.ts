@@ -10,12 +10,15 @@ import {
 import { Rol } from '../../roles/entities/rol.entity';
 import { Profesional } from '../../profesionales/entities/profesional.entity';
 import { Paciente } from '../../pacientes/entities/paciente.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity('usuarios')
 export class Usuario {
+  @ApiProperty({ description: 'Identificador único del usuario (UUID)' })
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @ApiProperty({ description: 'Nombre de usuario, debe ser único' })
   @Column({
     unique: true,
     nullable: false,
@@ -24,9 +27,13 @@ export class Usuario {
   })
   nombreUsuario: string; // nombre_usuario
 
+  @ApiProperty({
+    description: 'Contraseña del usuario (almacenada como un hash)',
+  })
   @Column({ nullable: false })
   contrasena: string; // contrasena (hash)
 
+  @ApiProperty({ description: 'ID del rol asociado al usuario' })
   @Column({ name: 'id_rol', type: 'uuid', nullable: false })
   idRol: string;
 

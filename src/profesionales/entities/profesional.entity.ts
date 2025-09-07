@@ -13,12 +13,15 @@ import { CentroDeSalud } from '../../centros-de-salud/entities/centro-de-salud.e
 import { AgendaProfesional } from '../../agendas/entities/agenda-profesional.entity'; // Se definirá
 import { Cita } from '../../citas/entities/cita.entity'; // Se definirá
 import { ProfesionalServicio } from 'src/profesional-servicios/entities/profesional-servicio.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity('profesionales')
 export class Profesional {
+  @ApiProperty({ description: 'Identificador único del profesional (UUID)' })
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @ApiProperty({ description: 'Identificador único del usuario asociado' })
   @Column({ name: 'id_usuario', type: 'uuid', unique: true, nullable: false })
   idUsuario: string;
 
@@ -30,21 +33,35 @@ export class Profesional {
   @JoinColumn({ name: 'id_usuario' })
   usuario: Usuario;
 
+  @ApiProperty({ description: 'Nombre del profesional' })
   @Column({ nullable: false, length: 100, name: 'nombre' })
   nombre: string;
 
+  @ApiProperty({ description: 'Apellido del profesional' })
   @Column({ nullable: false, length: 100, name: 'apellido' })
   apellido: string;
 
+  @ApiProperty({
+    description: 'Dirección de correo electrónico del profesional',
+  })
   @Column({ unique: true, nullable: true, length: 150 })
   email: string;
 
+  @ApiProperty({
+    description: 'Número de teléfono del profesional',
+    required: false,
+  })
   @Column({ nullable: true, length: 20 })
   telefono: string;
 
+  @ApiProperty({ description: 'Especialidad del profesional', required: false })
   @Column({ nullable: true, length: 100 })
   especialidad: string;
 
+  @ApiProperty({
+    description: 'Identificador único del centro de salud',
+    required: false,
+  })
   @Column({ name: 'id_centro_salud', type: 'uuid', nullable: true })
   idCentroDeSalud: string;
 

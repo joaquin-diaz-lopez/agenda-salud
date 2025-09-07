@@ -1,4 +1,5 @@
 // src/servicios/dto/create-servicio.dto.ts
+
 import {
   IsString,
   IsNotEmpty,
@@ -8,7 +9,8 @@ import {
   MaxLength,
   IsOptional,
 } from 'class-validator';
-import { Type } from 'class-transformer'; // Necesario para transformar el tipo de datos
+import { Type } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 
 /**
  * DTO (Data Transfer Object) para la creación de un nuevo Servicio.
@@ -23,6 +25,10 @@ export class CreateServicioDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(100)
+  @ApiProperty({
+    example: 'Consulta Médica',
+    description: 'Nombre único del servicio de salud.',
+  })
   nombre: string;
 
   /**
@@ -32,6 +38,11 @@ export class CreateServicioDto {
   @IsOptional()
   @IsString()
   @MaxLength(255)
+  @ApiProperty({
+    example: 'Consulta general para el diagnóstico y tratamiento.',
+    description: 'Descripción detallada del servicio.',
+    required: false,
+  })
   descripcion?: string;
 
   /**
@@ -39,9 +50,14 @@ export class CreateServicioDto {
    * Es opcional, pero si se provee, debe ser un entero positivo.
    */
   @IsOptional()
-  @Type(() => Number) // Transforma la entrada a tipo numérico
+  @Type(() => Number)
   @IsInt({ message: 'La duración debe ser un número entero.' })
   @Min(1, { message: 'La duración debe ser de al menos 1 minuto.' })
+  @ApiProperty({
+    example: 30,
+    description: 'Duración del servicio en minutos.',
+    required: false,
+  })
   duracionMinutos?: number;
 
   /**
@@ -49,11 +65,16 @@ export class CreateServicioDto {
    * Es opcional, pero si se provee, debe ser un número con hasta 2 decimales y no negativo.
    */
   @IsOptional()
-  @Type(() => Number) // Transforma la entrada a tipo numérico
+  @Type(() => Number)
   @IsNumber(
     { maxDecimalPlaces: 2 },
     { message: 'El precio debe tener como máximo 2 decimales.' },
   )
   @Min(0, { message: 'El precio no puede ser negativo.' })
+  @ApiProperty({
+    example: 50.0,
+    description: 'Precio del servicio.',
+    required: false,
+  })
   precio?: number;
 }

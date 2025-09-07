@@ -7,6 +7,7 @@ import {
   IsOptional,
   MaxLength,
 } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 /**
  * DTO (Data Transfer Object) para la creación de un nuevo Profesional.
@@ -18,6 +19,7 @@ export class CreateProfesionalDto {
    * El ID (UUID) del usuario asociado a este profesional.
    * Es obligatorio, ya que cada profesional debe tener un usuario en el sistema.
    */
+  @ApiProperty({ description: 'Identificador único del usuario asociado' })
   @IsUUID()
   @IsNotEmpty()
   idUsuario: string;
@@ -26,6 +28,7 @@ export class CreateProfesionalDto {
    * Nombre del profesional.
    * Es obligatorio, una cadena de texto y con una longitud máxima de 100 caracteres.
    */
+  @ApiProperty({ description: 'Nombre del profesional' })
   @IsString()
   @IsNotEmpty()
   @MaxLength(100)
@@ -35,6 +38,7 @@ export class CreateProfesionalDto {
    * Apellido del profesional.
    * Es obligatorio, una cadena de texto y con una longitud máxima de 100 caracteres.
    */
+  @ApiProperty({ description: 'Apellido del profesional' })
   @IsString()
   @IsNotEmpty()
   @MaxLength(100)
@@ -45,6 +49,9 @@ export class CreateProfesionalDto {
    * Debe ser un formato de email válido. Aunque en la entidad es nullable,
    * generalmente se hace obligatorio para la creación de un profesional.
    */
+  @ApiProperty({
+    description: 'Dirección de correo electrónico del profesional',
+  })
   @IsEmail()
   @IsNotEmpty()
   @MaxLength(150)
@@ -54,6 +61,10 @@ export class CreateProfesionalDto {
    * Número de teléfono del profesional.
    * Es opcional y con una longitud máxima de 20 caracteres.
    */
+  @ApiProperty({
+    description: 'Número de teléfono del profesional',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   @MaxLength(20)
@@ -63,6 +74,10 @@ export class CreateProfesionalDto {
    * Especialidad médica o de salud del profesional.
    * Es opcional y con una longitud máxima de 100 caracteres.
    */
+  @ApiProperty({
+    description: 'Especialidad médica o de salud del profesional',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   @MaxLength(100)
@@ -72,6 +87,10 @@ export class CreateProfesionalDto {
    * El ID (UUID) del centro de salud al que se asocia el profesional.
    * Es opcional, permitiendo profesionales sin un centro de salud asignado inicialmente.
    */
+  @ApiProperty({
+    description: 'Identificador único del centro de salud asociado',
+    required: false,
+  })
   @IsOptional()
   @IsUUID()
   idCentroDeSalud?: string;

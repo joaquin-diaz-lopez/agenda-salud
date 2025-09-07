@@ -31,8 +31,12 @@ export class RolesService {
     return this.rolesRepository.find();
   }
 
-  async findOne(id: string): Promise<Rol | null> {
-    return this.rolesRepository.findOne({ where: { id } });
+  async findOne(id: string): Promise<Rol> {
+    const rol = await this.rolesRepository.findOne({ where: { id } });
+    if (!rol) {
+      throw new NotFoundException(`Rol con UUID "${id}" no encontrado.`);
+    }
+    return rol;
   }
 
   async findByNombre(nombre: string): Promise<Rol | null> {

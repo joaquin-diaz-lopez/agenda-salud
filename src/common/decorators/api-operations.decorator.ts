@@ -32,16 +32,19 @@ export function ApiCreateOperation<T extends Type<any>>(
  * Decorador que documenta una operación de obtención de múltiples recursos (GET).
  * @param model La clase de la entidad que se está obteniendo.
  * @param summary Un resumen de la operación.
+ * @param responseModel (Opcional) Un DTO de respuesta para la documentación.
  */
 export function ApiFindAllOperation<T extends Type<any>>(
   model: T,
   summary: string,
+  responseModel?: T, // Añade este parámetro opcional
 ) {
+  const type = responseModel || model;
   return applyDecorators(
     ApiOperation({ summary }),
     ApiOkResponse({
       description: `Lista de recursos ${model.name}s obtenida exitosamente.`,
-      type: [model],
+      type: [type], // Asegúrate de que el tipo sea un array
     }),
     ApiCommonResponses(),
   );
@@ -51,16 +54,19 @@ export function ApiFindAllOperation<T extends Type<any>>(
  * Decorador que documenta una operación de obtención de un solo recurso por ID (GET).
  * @param model La clase de la entidad que se está obteniendo.
  * @param summary Un resumen de la operación.
+ * @param responseModel (Opcional) Un DTO de respuesta para la documentación.
  */
 export function ApiFindOneOperation<T extends Type<any>>(
   model: T,
   summary: string,
+  responseModel?: T, // Añade este parámetro opcional
 ) {
+  const type = responseModel || model;
   return applyDecorators(
     ApiOperation({ summary }),
     ApiOkResponse({
       description: `El recurso ${model.name} ha sido obtenido exitosamente.`,
-      type: model,
+      type, // Sin corchetes, ya que es un solo objeto
     }),
     ApiNotFoundResponse({
       description: `El recurso ${model.name} no fue encontrado.`,

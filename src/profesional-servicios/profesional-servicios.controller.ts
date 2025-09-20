@@ -1,4 +1,3 @@
-// src/profesional-servicios/profesional-servicios.controller.ts
 import {
   Controller,
   Post,
@@ -8,28 +7,47 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import { ApiTags, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { ProfesionalServiciosService } from './profesional-servicios.service';
 import { CreateProfesionalServicioDto } from './dto/create-profesional-servicio.dto';
 import { ProfesionalServicio } from './entities/profesional-servicio.entity';
+import {
+  ApiCreateOperation,
+  ApiFindAllOperation,
+  ApiFindOneOperation,
+} from '../common/decorators/api-operations.decorator';
+import { ProfesionalServicioResponseDto } from './dto/profesional-servicio-response.dto';
 
-/**
- * Controlador para la gestión de asociaciones Profesional-Servicio.
- * Expone endpoints HTTP para crear y consultar qué servicios ofrece cada profesional.
- */
-@Controller('profesional-servicios') // Ruta base para este controlador: /profesional-servicios
+@Controller('profesional-servicios')
+@ApiTags('ProfesionalServicios')
 export class ProfesionalServiciosController {
   constructor(
     private readonly profesionalServiciosService: ProfesionalServiciosService,
   ) {}
 
-  /**
-   * Crea una nueva asociación entre un profesional y un servicio.
-   * Maneja las solicitudes POST a /profesional-servicios.
-   * @param createProfesionalServicioDto El DTO con los IDs del profesional y el servicio.
-   * @returns La asociación ProfesionalServicio recién creada.
-   */
   @Post()
-  @HttpCode(HttpStatus.CREATED) // Retorna un estado 201 Created si es exitoso
+  @HttpCode(HttpStatus.CREATED)
+  @ApiCreateOperation(
+    ProfesionalServicio,
+    'Crea una nueva asociación entre un profesional y un servicio',
+  )
+  @ApiBody({
+    type: CreateProfesionalServicioDto,
+    description: 'IDs del profesional y el servicio para crear la asociación.',
+    examples: {
+      ejemplo1: {
+        value: {
+          idProfesional: '123e4567-e89b-12d3-a456-426614174000',
+          idServicio: 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d',
+        },
+        description: 'Crea una nueva asociación válida.',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'La asociación entre el profesional y el servicio ya existe.',
+  })
   async create(
     @Body() createProfesionalServicioDto: CreateProfesionalServicioDto,
   ): Promise<ProfesionalServicio> {
@@ -38,25 +56,24 @@ export class ProfesionalServiciosController {
     );
   }
 
-  /**
-   * Obtiene todas las asociaciones profesional-servicio.
-   * Maneja las solicitudes GET a /profesional-servicios.
-   * @returns Un array de todas las asociaciones profesional-servicio.
-   */
   @Get()
   @HttpCode(HttpStatus.OK)
+  @ApiFindAllOperation(
+    ProfesionalServicio,
+    'Obtiene todas las asociaciones entre profesionales y servicios',
+    ProfesionalServicioResponseDto, // Pasa el DTO de respuesta aquí
+  )
   async findAll(): Promise<ProfesionalServicio[]> {
     return this.profesionalServiciosService.findAll();
   }
 
-  /**
-   * Obtiene una asociación profesional-servicio específica por su ID.
-   * Maneja las solicitudes GET a /profesional-servicios/:id.
-   * @param id El ID (UUID) de la asociación a buscar.
-   * @returns La asociación encontrada o null.
-   */
   @Get(':id')
   @HttpCode(HttpStatus.OK)
+  @ApiFindOneOperation(
+    ProfesionalServicio,
+    'Obtiene una asociación por su ID',
+    ProfesionalServicioResponseDto, // Pasa el DTO de respuesta aquí
+  )
   async findOne(@Param('id') id: string): Promise<ProfesionalServicio | null> {
     return this.profesionalServiciosService.findOne(id);
   }

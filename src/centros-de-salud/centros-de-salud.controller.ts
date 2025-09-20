@@ -1,4 +1,3 @@
-// src/centros-de-salud/centros-de-salud.controller.ts
 import {
   Controller,
   Post,
@@ -8,27 +7,62 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { CentrosDeSaludService } from './centros-de-salud.service'; // Importa el servicio de Centros de Salud
-import { CreateCentroDeSaludDto } from './dto/create-centro-de-salud.dto'; // Importa el DTO de creación de Centro de Salud
-import { CentroDeSalud } from './entities/centro-de-salud.entity'; // Importa la entidad CentroDeSalud
+import { ApiTags, ApiBody, ApiResponse } from '@nestjs/swagger';
+import { CentrosDeSaludService } from './centros-de-salud.service';
+import { CreateCentroDeSaludDto } from './dto/create-centro-de-salud.dto';
+import { CentroDeSalud } from './entities/centro-de-salud.entity';
+import {
+  ApiCreateOperation,
+  ApiFindAllOperation,
+  ApiFindOneOperation,
+} from '../common/decorators/api-operations.decorator';
+import { CentroDeSaludResponseDto } from './dto/centro-de-salud-response.dto';
 
 /**
  * Controlador para la gestión de Centros de Salud.
  * Expone los endpoints HTTP para realizar operaciones CRUD básicas sobre los centros de salud.
  */
-@Controller('centros-de-salud') // Define la ruta base para este controlador: /centros-de-salud
+@Controller('centros-de-salud')
+@ApiTags('Centros de Salud')
 export class CentrosDeSaludController {
   constructor(private readonly centrosDeSaludService: CentrosDeSaludService) {}
 
   /**
    * Crea un nuevo centro de salud.
    * Maneja las solicitudes POST a /centros-de-salud.
-   * Utiliza el ValidationPipe global (si está configurado en main.ts) para validar el CreateCentroDeSaludDto.
    * @param createCentroDeSaludDto El DTO con los datos para crear el centro de salud.
    * @returns El centro de salud recién creado.
    */
   @Post()
-  @HttpCode(HttpStatus.CREATED) // Retorna un estado 201 Created si es exitoso
+  @HttpCode(HttpStatus.CREATED)
+  @ApiCreateOperation(CentroDeSalud, 'Crea un nuevo centro de salud')
+  @ApiBody({
+    type: CreateCentroDeSaludDto,
+    description: 'Datos para crear un nuevo centro de salud.',
+    examples: {
+      ejemplo1: {
+        value: {
+          nombre: 'Centro de Salud Acajete',
+          direccion: 'Calle Principal #123, Acajete, Ver.',
+          telefono: '228-123-4567',
+          email: 'contacto@centrosaludacajete.org',
+        },
+        description: 'Ejemplo de creación de un centro de salud completo.',
+      },
+      ejemplo2: {
+        value: {
+          nombre: 'Consultorio Particular',
+          direccion: 'Av. Siempres Vivas #55',
+        },
+        description:
+          'Ejemplo de creación de un centro de salud con solo los campos obligatorios.',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'El centro de salud con ese nombre ya existe.',
+  })
   async create(
     @Body() createCentroDeSaludDto: CreateCentroDeSaludDto,
   ): Promise<CentroDeSalud> {
@@ -41,7 +75,12 @@ export class CentrosDeSaludController {
    * @returns Un array de todos los centros de salud.
    */
   @Get()
-  @HttpCode(HttpStatus.OK) // Retorna un estado 200 OK
+  @HttpCode(HttpStatus.OK)
+  @ApiFindAllOperation(
+    CentroDeSalud,
+    'Obtiene todos los centros de salud',
+    CentroDeSaludResponseDto, // Se pasa el DTO de respuesta aquí
+  )
   async findAll(): Promise<CentroDeSalud[]> {
     return this.centrosDeSaludService.findAll();
   }
@@ -53,7 +92,12 @@ export class CentrosDeSaludController {
    * @returns El centro de salud encontrado o null.
    */
   @Get(':id')
-  @HttpCode(HttpStatus.OK) // Retorna un estado 200 OK
+  @HttpCode(HttpStatus.OK)
+  @ApiFindOneOperation(
+    CentroDeSalud,
+    'Obtiene un centro de salud por su ID',
+    CentroDeSaludResponseDto, // Se pasa el DTO de respuesta aquí
+  )
   async findOne(@Param('id') id: string): Promise<CentroDeSalud | null> {
     return this.centrosDeSaludService.findOne(id);
   }

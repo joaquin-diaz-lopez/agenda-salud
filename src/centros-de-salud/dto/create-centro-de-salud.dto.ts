@@ -1,4 +1,3 @@
-// src/centros-de-salud/dto/create-centro-de-salud.dto.ts
 import {
   IsString,
   IsNotEmpty,
@@ -6,6 +5,7 @@ import {
   IsOptional,
   MaxLength,
 } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 /**
  * DTO (Data Transfer Object) para la creación de un nuevo Centro de Salud.
@@ -20,6 +20,10 @@ export class CreateCentroDeSaludDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(150)
+  @ApiProperty({
+    example: 'Centro de Salud Acajete',
+    description: 'Nombre único del centro de salud.',
+  })
   nombre: string;
 
   /**
@@ -29,6 +33,11 @@ export class CreateCentroDeSaludDto {
   @IsOptional()
   @IsString()
   @MaxLength(255)
+  @ApiProperty({
+    example: 'Calle Principal #123, Acajete, Ver.',
+    description: 'Dirección del centro de salud.',
+    required: false,
+  })
   direccion?: string;
 
   /**
@@ -38,6 +47,11 @@ export class CreateCentroDeSaludDto {
   @IsOptional()
   @IsString()
   @MaxLength(20)
+  @ApiProperty({
+    example: '228-123-4567',
+    description: 'Número de teléfono de contacto.',
+    required: false,
+  })
   telefono?: string;
 
   /**
@@ -47,5 +61,10 @@ export class CreateCentroDeSaludDto {
   @IsOptional()
   @IsEmail()
   @MaxLength(150)
+  @ApiProperty({
+    example: 'contacto@centrosaludacajete.org',
+    description: 'Dirección de correo electrónico del centro de salud.',
+    required: false,
+  })
   email?: string;
 }

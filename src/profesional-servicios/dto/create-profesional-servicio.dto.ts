@@ -1,5 +1,5 @@
-// src/profesional-servicios/dto/create-profesional-servicio.dto.ts
 import { IsUUID, IsNotEmpty } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 /**
  * DTO para la creación de una asociación entre un Profesional y un Servicio.
@@ -13,6 +13,10 @@ export class CreateProfesionalServicioDto {
    */
   @IsUUID()
   @IsNotEmpty()
+  @ApiProperty({
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    description: 'El UUID del profesional que ofrecerá el servicio.',
+  })
   idProfesional: string;
 
   /**
@@ -21,5 +25,9 @@ export class CreateProfesionalServicioDto {
    */
   @IsUUID()
   @IsNotEmpty()
+  @ApiProperty({
+    example: 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d',
+    description: 'El UUID del servicio que se asociará al profesional.',
+  })
   idServicio: string;
 }

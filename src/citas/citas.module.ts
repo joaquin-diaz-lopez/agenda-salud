@@ -11,10 +11,6 @@ import { ProfesionalesModule } from '../profesionales/profesionales.module';
 import { ServiciosModule } from '../servicios/servicios.module';
 import { AgendasModule } from 'src/agendas/agendas.module';
 
-// TODO: Descomentar y asegurar que este módulo esté disponible una vez creado.
-// Este módulo contendrá SlotDisponibilidadService.
-// import { AgendasModule } from '../agendas/agendas.module';
-
 /**
  * Módulo para la gestión de Citas.
  * Integra la entidad Cita con su servicio y controlador,

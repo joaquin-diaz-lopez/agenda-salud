@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CentroDeSalud } from './entities/centro-de-salud.entity'; // Importa la entidad CentroDeSalud
 import { CreateCentroDeSaludDto } from './dto/create-centro-de-salud.dto'; // Importa el DTO de creación
+import { Profesional } from 'src/profesionales/entities/profesional.entity';
 
 /**
  * Servicio para la gestión de Centros de Salud.
@@ -52,7 +53,9 @@ export class CentrosDeSaludService {
    * @returns Una promesa que resuelve a un array de objetos CentroDeSalud.
    */
   async findAll(): Promise<CentroDeSalud[]> {
-    return this.centrosDeSaludRepository.find();
+    return this.centrosDeSaludRepository.find({
+      relations: ['profesionales'],
+    });
   }
 
   /**

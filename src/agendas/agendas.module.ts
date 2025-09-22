@@ -22,6 +22,7 @@ import { SlotDisponibilidadController } from './slot-disponibilidad.controller';
 
 // Otros módulos necesarios para las inyecciones de dependencia en los servicios de Agendas
 import { ProfesionalesModule } from '../profesionales/profesionales.module';
+import { DescansosModule } from './descansos/descansos.module';
 
 /**
  * Módulo para la gestión integral de Agendas de Profesionales.
@@ -39,6 +40,7 @@ import { ProfesionalesModule } from '../profesionales/profesionales.module';
     ]),
     // Importa el módulo de Profesionales porque AgendaProfesionalService lo necesita
     ProfesionalesModule,
+    DescansosModule,
   ],
   providers: [
     // Registra todos los servicios del módulo como proveedores

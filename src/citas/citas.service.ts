@@ -15,8 +15,8 @@ import { PacientesService } from '../pacientes/pacientes.service';
 import { ProfesionalesService } from '../profesionales/profesionales.service';
 import { ServiciosService } from '../servicios/servicios.service';
 
-import { SlotDisponibilidadService } from '../agendas/slot-disponibilidad.service';
-import { SlotDisponibilidad } from '../agendas/entities/slot-disponibilidad.entity'; // Importa la entidad SlotDisponibilidad
+import { SlotDisponibilidadService } from 'src/agendas/slots-disponibilidad/slot-disponibilidad.service';
+import { SlotDisponibilidad } from '../agendas/slots-disponibilidad/entities/slot-disponibilidad.entity';
 
 /**
  * Servicio para la gestión de Citas.

@@ -10,8 +10,8 @@ import { Repository } from 'typeorm';
 import { Descanso } from './entities/descanso.entity';
 import { CreateDescansoDto } from './dto/create-descanso.dto';
 import { UpdateDescansoDto } from './dto/update-descanso.dto';
-import { JornadaDiariaService } from '../jornada-diaria.service';
-import { JornadaDiaria } from '../entities/jornada-diaria.entity';
+import { JornadaDiariaService } from '../jornadas-diarias/jornada-diaria.service';
+import { JornadaDiaria } from '../jornadas-diarias/entities/jornada-diaria.entity';
 
 /**
  * Servicio para la gestión de Descansos.

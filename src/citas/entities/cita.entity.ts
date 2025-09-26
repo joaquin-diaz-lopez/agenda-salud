@@ -9,7 +9,8 @@ import {
 } from 'typeorm';
 import { Paciente } from '../../pacientes/entities/paciente.entity';
 import { Profesional } from '../../profesionales/entities/profesional.entity';
-import { SlotDisponibilidad } from '../../agendas/entities/slot-disponibilidad.entity';
+//import { SlotDisponibilidad } from '../../agendas/entities/slot-disponibilidad.entity';
+import { SlotDisponibilidad } from '../../agendas/slots-disponibilidad/entities/slot-disponibilidad.entity';
 import { Servicio } from '../../servicios/entities/servicio.entity';
 
 @Entity('citas')

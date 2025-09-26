@@ -10,10 +10,8 @@ import { Repository } from 'typeorm';
 import { SlotDisponibilidad } from './entities/slot-disponibilidad.entity';
 import { CreateSlotDisponibilidadDto } from './dto/create-slot-disponibilidad.dto';
 import { UpdateSlotDisponibilidadDto } from './dto/update-slot-disponibilidad.dto';
-import { JornadaDiariaService } from './jornada-diaria.service'; // Necesario para validar Jornada Diaria
-import { DescansoService } from './descanso.service'; // Necesario para verificar descansos
-import { JornadaDiaria } from './entities/jornada-diaria.entity';
-import { Descanso } from './entities/descanso.entity';
+import { JornadaDiariaService } from 'src/agendas/jornadas-diarias/jornada-diaria.service';
+import { DescansoService } from 'src/agendas/descansos/descanso.service';
 
 /**
  * Servicio para la gestión de Slots de Disponibilidad.
@@ -25,8 +23,8 @@ export class SlotDisponibilidadService {
   constructor(
     @InjectRepository(SlotDisponibilidad)
     private slotDisponibilidadRepository: Repository<SlotDisponibilidad>,
-    private jornadaDiariaService: JornadaDiariaService, // Inyecta JornadaDiariaService
-    private descansoService: DescansoService, // Inyecta DescansoService
+    private jornadaDiariaService: JornadaDiariaService,
+    private descansoService: DescansoService,
   ) {}
 
   /**

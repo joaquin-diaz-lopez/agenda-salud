@@ -7,9 +7,9 @@ import {
   JoinColumn,
   OneToOne,
 } from 'typeorm';
-import { JornadaDiaria } from './jornada-diaria.entity';
-import { Cita } from '../../citas/entities/cita.entity';
-import { Descanso } from './descanso.entity';
+import { JornadaDiaria } from '../../jornadas-diarias/entities/jornada-diaria.entity';
+import { Cita } from '../../../citas/entities/cita.entity';
+import { Descanso } from '../../descansos/entities/descanso.entity';
 
 @Entity('slots_disponibilidad')
 export class SlotDisponibilidad {

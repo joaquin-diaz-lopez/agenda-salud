@@ -8,9 +8,9 @@ import {
   OneToMany,
   Unique,
 } from 'typeorm';
-import { AgendaProfesional } from './agenda-profesional.entity';
-import { SlotDisponibilidad } from './slot-disponibilidad.entity';
-import { Descanso } from './descanso.entity';
+import { AgendaProfesional } from '../../entities/agenda-profesional.entity';
+import { SlotDisponibilidad } from '../../slots-disponibilidad/entities/slot-disponibilidad.entity';
+import { Descanso } from '../../descansos/entities/descanso.entity';
 
 @Entity('jornadas_diarias')
 @Unique(['idAgendaProfesional', 'fecha'])

@@ -8,7 +8,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Profesional } from '../../profesionales/entities/profesional.entity';
-import { JornadaDiaria } from './jornada-diaria.entity';
+import { JornadaDiaria } from '../jornadas-diarias/entities/jornada-diaria.entity';
 
 @Entity('agendas_profesionales')
 export class AgendaProfesional {

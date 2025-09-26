@@ -7,8 +7,8 @@ import {
   JoinColumn,
   OneToMany,
 } from 'typeorm';
-import { JornadaDiaria } from '../../entities/jornada-diaria.entity';
-import { SlotDisponibilidad } from '../../entities/slot-disponibilidad.entity';
+import { JornadaDiaria } from '../../jornadas-diarias/entities/jornada-diaria.entity';
+import { SlotDisponibilidad } from '../../slots-disponibilidad/entities/slot-disponibilidad.entity';
 
 @Entity('descansos')
 export class Descanso {

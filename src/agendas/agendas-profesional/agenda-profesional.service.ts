@@ -9,7 +9,7 @@ import { Repository } from 'typeorm';
 import { AgendaProfesional } from './entities/agenda-profesional.entity';
 import { CreateAgendaProfesionalDto } from './dto/create-agenda-profesional.dto';
 import { UpdateAgendaProfesionalDto } from './dto/update-agenda-profesional.dto';
-import { ProfesionalesService } from '../profesionales/profesionales.service'; // Necesario para validar Profesional
+import { ProfesionalesService } from '../../profesionales/profesionales.service';
 
 /**
  * Servicio para la gestión de Agendas Profesionales.

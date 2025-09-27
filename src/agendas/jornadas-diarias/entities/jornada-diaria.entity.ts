@@ -8,7 +8,7 @@ import {
   OneToMany,
   Unique,
 } from 'typeorm';
-import { AgendaProfesional } from '../../entities/agenda-profesional.entity';
+import { AgendaProfesional } from '../../agendas-profesional/entities/agenda-profesional.entity';
 import { SlotDisponibilidad } from '../../slots-disponibilidad/entities/slot-disponibilidad.entity';
 import { Descanso } from '../../descansos/entities/descanso.entity';
 

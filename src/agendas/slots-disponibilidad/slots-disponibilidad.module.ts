@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SlotDisponibilidad } from './entities/slot-disponibilidad.entity';
 import { SlotDisponibilidadController } from './slot-disponibilidad.controller';
@@ -9,11 +9,11 @@ import { DescansosModule } from 'src/agendas/descansos/descansos.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([SlotDisponibilidad]),
-    forwardRef(() => JornadasDiariasModule),
-    forwardRef(() => DescansosModule),
+    JornadasDiariasModule,
+    DescansosModule,
   ],
   controllers: [SlotDisponibilidadController],
   providers: [SlotDisponibilidadService],
-  exports: [forwardRef(() => SlotDisponibilidadService)],
+  exports: [SlotDisponibilidadService],
 })
 export class SlotsDisponibilidadModule {}

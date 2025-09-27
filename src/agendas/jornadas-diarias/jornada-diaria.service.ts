@@ -10,7 +10,7 @@ import { Repository } from 'typeorm';
 import { JornadaDiaria } from './entities/jornada-diaria.entity';
 import { CreateJornadaDiariaDto } from './dto/create-jornada-diaria.dto';
 import { UpdateJornadaDiariaDto } from './dto/update-jornada-diaria.dto';
-import { AgendaProfesionalService } from '../agenda-profesional.service'; // Necesario para validar Agenda Profesional
+import { AgendaProfesionalService } from 'src/agendas/agendas-profesional/agenda-profesional.service';
 
 /**
  * Servicio para la gestión de Jornadas Diarias.

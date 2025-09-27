@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { Usuario } from '../../usuarios/entities/usuario.entity';
 import { CentroDeSalud } from '../../centros-de-salud/entities/centro-de-salud.entity';
-import { AgendaProfesional } from '../../agendas/entities/agenda-profesional.entity'; // Se definirá
+import { AgendaProfesional } from '../../agendas/agendas-profesional/entities/agenda-profesional.entity'; // Se definirá
 import { Cita } from '../../citas/entities/cita.entity'; // Se definirá
 import { ProfesionalServicio } from 'src/profesional-servicios/entities/profesional-servicio.entity';
 import { ApiProperty } from '@nestjs/swagger';

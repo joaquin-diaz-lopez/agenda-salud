@@ -1,4 +1,3 @@
-// src/agendas/dto/create-descanso.dto.ts
 import { Type } from 'class-transformer';
 import {
   IsUUID,
@@ -7,6 +6,7 @@ import {
   MaxLength,
   IsDate,
 } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger'; // <-- ¡Importación necesaria!
 
 /**
  * DTO (Data Transfer Object) para la creación de un nuevo Descanso.
@@ -16,37 +16,55 @@ import {
 export class CreateDescansoDto {
   /**
    * El ID (UUID) de la jornada diaria a la que pertenece este descanso.
-   * Es obligatorio y debe ser un UUID válido.
    */
   @IsUUID()
   @IsNotEmpty()
+  @ApiProperty({
+    example: 'f9e8d7c6-b5a4-3210-fedc-ba9876543210',
+    description: 'ID de la jornada diaria asociada al descanso.',
+  })
   idJornadaDiaria: string;
 
   /**
    * Hora de inicio del descanso.
-   * Es obligatoria y debe ser una cadena de fecha ISO 8601 válida.
-   * Nota: Aunque la entidad usa `timestamp with time zone`, en el DTO se suele recibir un string.
    */
   @IsDate({ message: 'horaInicio debe ser un objeto Date válido.' })
   @IsNotEmpty()
-  @Type(() => Date) // <-- ¡CORRECCIÓN AQUÍ!
+  @Type(() => Date)
+  @ApiProperty({
+    example: '2025-01-21T13:00:00Z',
+    description:
+      'Hora de inicio del descanso. Formato ISO 8601 con zona horaria (UTC recomendado).',
+    type: 'string',
+    format: 'date-time',
+  })
   horaInicio: Date;
 
   /**
    * Hora de fin del descanso.
-   * Es obligatoria y debe ser una cadena de fecha ISO 8601 válida.
    */
   @IsDate({ message: 'horaFin debe ser un objeto Date válido.' })
   @IsNotEmpty()
-  @Type(() => Date) // <-- ¡CORRECCIÓN AQUÍ!
+  @Type(() => Date)
+  @ApiProperty({
+    example: '2025-01-21T14:00:00Z',
+    description:
+      'Hora de fin del descanso. Formato ISO 8601 con zona horaria (UTC recomendado).',
+    type: 'string',
+    format: 'date-time',
+  })
   horaFin: Date;
 
   /**
    * Razón del descanso (ej. "Almuerzo", "Reunión").
-   * Es obligatoria, una cadena de texto con una longitud máxima de 100 caracteres.
    */
   @IsString()
   @IsNotEmpty()
   @MaxLength(100)
+  @ApiProperty({
+    example: 'Almuerzo',
+    description: 'Razón del descanso.',
+    maxLength: 100,
+  })
   razon: string;
 }

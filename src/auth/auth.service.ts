@@ -22,10 +22,14 @@ export class AuthService {
   async validateUsuario(
     nombreUsuario: string,
     contrasena: string,
-  ): Promise<Usuario | null> {
+  ): Promise<Partial<Usuario> | null> {
     const usuario =
-      await this.usuariosService.buscarPorNombreUsuario(nombreUsuario);
+      await this.usuariosService.findByUsernameForAuth(nombreUsuario);
     if (!usuario) {
+      return null;
+    }
+    if (!usuario.contrasena) {
+      // Esto solo debería ocurrir si la consulta falla, pero es un buen control
       return null;
     }
     const esContrasenaValida = await bcrypt.compare(
@@ -35,7 +39,7 @@ export class AuthService {
     if (esContrasenaValida) {
       // Retorna el usuario sin la contraseña para evitar exponerla
       const { contrasena, ...resultado } = usuario;
-      return resultado as Usuario;
+      return resultado;
     }
     return null;
   }

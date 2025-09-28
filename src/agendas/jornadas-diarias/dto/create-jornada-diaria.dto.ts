@@ -1,4 +1,3 @@
-// src/agendas/dto/create-jornada-diaria.dto.ts
 import {
   IsUUID,
   IsNotEmpty,
@@ -6,6 +5,7 @@ import {
   IsString,
   Matches,
 } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger'; // <-- ¡Importación necesaria!
 
 /**
  * DTO (Data Transfer Object) para la creación de una nueva Jornada Diaria.
@@ -19,6 +19,10 @@ export class CreateJornadaDiariaDto {
    */
   @IsUUID()
   @IsNotEmpty()
+  @ApiProperty({
+    example: 'f9e8d7c6-b5a4-3210-fedc-ba9876543210',
+    description: 'ID de la agenda profesional dueña de esta jornada.',
+  })
   idAgendaProfesional: string;
 
   /**
@@ -27,6 +31,12 @@ export class CreateJornadaDiariaDto {
    */
   @IsDateString()
   @IsNotEmpty()
+  @ApiProperty({
+    example: '2025-01-20',
+    description:
+      'Fecha de la jornada. Se recomienda formato "YYYY-MM-DD" para evitar problemas de zona horaria.',
+    format: 'date',
+  })
   fecha: Date;
 
   /**
@@ -37,7 +47,12 @@ export class CreateJornadaDiariaDto {
   @IsNotEmpty()
   @Matches(/^([01]\d|2[0-3]):([0-5]\d)$/, {
     message: 'La hora de inicio debe estar en formato HH:MM',
-  }) // <-- ¡AJUSTE AQUÍ!
+  })
+  @ApiProperty({
+    example: '09:00',
+    description: 'Hora de inicio de la jornada de trabajo (formato HH:MM).',
+    pattern: '^([01]\\d|2[0-3]):([0-5]\\d)$',
+  })
   horaInicioTrabajo: string;
 
   /**
@@ -48,6 +63,11 @@ export class CreateJornadaDiariaDto {
   @IsNotEmpty()
   @Matches(/^([01]\d|2[0-3]):([0-5]\d)$/, {
     message: 'La hora de fin debe estar en formato HH:MM',
-  }) // <-- ¡AJUSTE AQUÍ!
+  })
+  @ApiProperty({
+    example: '17:00',
+    description: 'Hora de fin de la jornada de trabajo (formato HH:MM).',
+    pattern: '^([01]\\d|2[0-3]):([0-5]\\d)$',
+  })
   horaFinTrabajo: string;
 }

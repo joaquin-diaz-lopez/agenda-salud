@@ -13,6 +13,7 @@ import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { Usuario } from './entities/usuario.entity';
 import {
   ApiCreateOperation,
+  ApiFindAllOperation,
   ApiFindOneOperation,
 } from '../common/decorators/api-operations.decorator';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
@@ -28,6 +29,17 @@ export class UsuariosController {
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() createUsuarioDto: CreateUsuarioDto): Promise<Usuario> {
     return this.usuariosService.create(createUsuarioDto);
+  }
+
+  /**
+   * 🚨 NUEVO ENDPOINT: Obtener todos los usuarios.
+   * Utiliza el decorador personalizado para la documentación de Swagger.
+   */
+  @Get()
+  @ApiFindAllOperation(Usuario, 'Obtiene la lista de todos los usuarios')
+  @HttpCode(HttpStatus.OK)
+  async findAll(): Promise<Usuario[]> {
+    return this.usuariosService.findAll();
   }
 
   @Get(':id')

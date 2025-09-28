@@ -10,6 +10,7 @@ import { Usuario } from './entities/usuario.entity';
 import { CreateUsuarioDto } from './dto/create-usuario.dto'; // Necesitarás crear este DTO
 import * as bcrypt from 'bcrypt';
 import { Rol } from '../roles/entities/rol.entity'; // Importa la entidad Rol
+import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 
 @Injectable()
 export class UsuariosService {
@@ -102,5 +103,91 @@ export class UsuariosService {
    */
   async saveUsuario(usuario: Usuario): Promise<Usuario> {
     return this.usuariosRepository.save(usuario);
+  }
+
+  /**
+   * 🚨 NUEVO MÉTODO: Obtiene todos los usuarios.
+   * Excluye la contraseña por defecto (gracias a select: false en la Entidad).
+   * @returns Una lista de todos los objetos Usuario, incluyendo su rol.
+   */
+  async findAll(): Promise<Usuario[]> {
+    return this.usuariosRepository.find({
+      relations: ['rol'],
+    });
+  }
+
+  // 🚨 MÉTODO PARA AUTH: Permite obtener la contraseña hasheada
+  // Usará el Query Builder para añadir select('usuario.contrasena')
+  async findByUsernameForAuth(nombreUsuario: string): Promise<Usuario | null> {
+    return this.usuariosRepository
+      .createQueryBuilder('usuario')
+      .addSelect('usuario.contrasena')
+      .where('usuario.nombreUsuario = :nombreUsuario', { nombreUsuario })
+      .getOne();
+  }
+  /**
+   * 🚨 NUEVO MÉTODO: Actualiza parcialmente un usuario.
+   * Maneja el hasheo de la contraseña si se proporciona.
+   * @param id ID del usuario a actualizar.
+   * @param updateUsuarioDto Datos a actualizar.
+   * @returns El usuario actualizado.
+   * @throws NotFoundException si el usuario o rol no existen.
+   */
+  async update(
+    id: string,
+    updateUsuarioDto: UpdateUsuarioDto,
+  ): Promise<Usuario> {
+    const usuario = await this.buscarPorId(id); // Reusa el método para encontrar el usuario
+
+    if (!usuario) {
+      throw new NotFoundException(`Usuario con ID "${id}" no encontrado.`);
+    }
+
+    // 1. Manejo y Hasheo de Contraseña
+    if (updateUsuarioDto.contrasena) {
+      updateUsuarioDto.contrasena = await bcrypt.hash(
+        updateUsuarioDto.contrasena,
+        10,
+      );
+    }
+
+    // 2. Manejo de Rol (si se proporciona un nuevo idRol)
+    let rol: Rol | null | undefined = undefined;
+    if (updateUsuarioDto.idRol) {
+      rol = await this.rolesRepository.findOne({
+        where: { id: updateUsuarioDto.idRol },
+      });
+      if (rol === null) {
+        throw new NotFoundException(
+          `El Rol con ID ${updateUsuarioDto.idRol} no fue encontrado.`,
+        );
+      }
+    }
+
+    // 3. Aplicar las actualizaciones a la entidad existente
+    // Usa Object.assign o merge para aplicar solo los campos provistos.
+    const usuarioActualizado = this.usuariosRepository.merge(usuario, {
+      ...updateUsuarioDto,
+      rol: rol, // Sobrescribe la relación 'rol' si se encontró un nuevo rol
+      idRol: updateUsuarioDto.idRol,
+    });
+
+    // 4. Guardar y retornar el usuario
+    return this.usuariosRepository.save(usuarioActualizado);
+  }
+
+  /**
+   * 🚨 NUEVO MÉTODO: Elimina un usuario por su ID.
+   * @param id ID del usuario a eliminar.
+   * @returns El usuario eliminado (opcionalmente) o un resultado de TypeORM.
+   * @throws NotFoundException si el usuario no existe.
+   */
+  async remove(id: string): Promise<void> {
+    const result = await this.usuariosRepository.delete(id);
+
+    if (result.affected === 0) {
+      throw new NotFoundException(`Usuario con ID "${id}" no encontrado.`);
+    }
+    // No devolvemos la entidad para indicar que la acción fue exitosa (204 No Content).
   }
 }

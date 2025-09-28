@@ -14,16 +14,22 @@ import { ApiCommonResponses } from './api-responses.decorator';
  * Decorador que documenta una operación de creación (POST).
  * @param model La clase de la entidad que se está creando.
  * @param summary Un resumen de la operación.
+ * @param responseModel (Opcional) Un DTO de respuesta para la documentación.
  */
 export function ApiCreateOperation<T extends Type<any>>(
   model: T,
   summary: string,
+  // 1. Añade el tercer parámetro opcional
+  responseModel?: Type<any>,
 ) {
+  // 2. Define el tipo a usar: DTO de respuesta si existe, sino la entidad
+  const type = responseModel || model;
+
   return applyDecorators(
     ApiOperation({ summary }),
     ApiCreatedResponse({
       description: `El recurso ${model.name} ha sido creado exitosamente.`,
-      type: model,
+      type: type, // 3. Usa la variable 'type'
     }),
     ApiCommonResponses(),
   );

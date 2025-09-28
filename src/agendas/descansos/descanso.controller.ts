@@ -11,7 +11,7 @@ import {
 import { ApiTags, ApiBody, ApiParam } from '@nestjs/swagger';
 import { DescansoService } from './descanso.service';
 import { CreateDescansoDto } from './dto/create-descanso.dto';
-import { UpdateDescansoDto } from './dto/update-descanso.dto';
+import { UpdateDescansoDto } from './dto/update-descanso.dto'; // <-- ¡Importación necesaria!
 import { Descanso } from './entities/descanso.entity';
 import {
   ApiCreateOperation,
@@ -20,9 +20,7 @@ import {
   ApiUpdateOperation,
 } from '../../common/decorators/api-operations.decorator';
 import { DescansoResponseDto } from './dto/descanso-response.dto';
-
-// Nuevo decorador para buscar por parámetro
-import { ApiFindAllByParamOperation } from '../../common/decorators/api-operations.decorator';
+// Nota: ApiFindAllByParamOperation no es necesario si se usa ApiFindAllOperation con ApiParam.
 
 /**
  * Controlador para la gestión de Descansos.
@@ -57,7 +55,7 @@ export class DescansoController {
   @ApiFindAllOperation(
     Descanso,
     'Obtiene todos los descansos',
-    DescansoResponseDto,
+    DescansoResponseDto, // <-- Usamos el DTO de respuesta
   )
   async findAll(): Promise<Descanso[]> {
     return this.descansoService.findAll();
@@ -71,7 +69,7 @@ export class DescansoController {
   @ApiFindOneOperation(
     Descanso,
     'Obtiene un descanso por su ID',
-    DescansoResponseDto,
+    DescansoResponseDto, // <-- Usamos el DTO de respuesta
   )
   @ApiParam({
     name: 'id',
@@ -90,7 +88,7 @@ export class DescansoController {
   @ApiFindAllOperation(
     Descanso,
     'Busca descansos por el ID de la jornada diaria',
-    DescansoResponseDto,
+    DescansoResponseDto, // <-- Usamos el DTO de respuesta
   )
   @ApiParam({
     name: 'idJornadaDiaria',
@@ -112,7 +110,7 @@ export class DescansoController {
   @ApiUpdateOperation(
     Descanso,
     'Actualiza un descanso por su ID',
-    DescansoResponseDto,
+    DescansoResponseDto, // <-- Usamos el DTO de respuesta
   )
   @ApiParam({
     name: 'id',

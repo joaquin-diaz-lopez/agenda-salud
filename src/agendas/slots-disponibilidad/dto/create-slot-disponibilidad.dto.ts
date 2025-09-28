@@ -1,33 +1,32 @@
-// src/agendas/dto/create-slot-disponibilidad.dto.ts
 import { IsUUID, IsNotEmpty, IsDateString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger'; // <-- ¡Importación necesaria!
 
-/**
- * DTO (Data Transfer Object) para la creación de un nuevo Slot de Disponibilidad.
- * Define la estructura y las reglas de validación para los datos
- * esperados al crear un registro en la tabla 'slots_disponibilidad'.
- */
 export class CreateSlotDisponibilidadDto {
-  /**
-   * El ID (UUID) de la jornada diaria a la que pertenece este slot.
-   * Es obligatorio y debe ser un UUID válido.
-   */
   @IsUUID()
   @IsNotEmpty()
+  @ApiProperty({
+    example: 'd1c2b3a4-5e6f-7890-1234-abcdef987654',
+    description: 'ID de la jornada diaria a la que pertenece este slot.',
+  })
   idJornadaDiaria: string;
 
-  /**
-   * Hora de inicio del slot.
-   * Es obligatoria y debe ser una cadena de fecha ISO 8601 válida.
-   */
   @IsDateString()
   @IsNotEmpty()
+  @ApiProperty({
+    example: '2025-01-21T10:00:00Z',
+    description: 'Hora de inicio del slot (ISO 8601 con zona horaria).',
+    type: 'string',
+    format: 'date-time',
+  })
   horaInicio: Date;
 
-  /**
-   * Hora de fin del slot.
-   * Es obligatoria y debe ser una cadena de fecha ISO 8601 válida.
-   */
   @IsDateString()
   @IsNotEmpty()
+  @ApiProperty({
+    example: '2025-01-21T10:30:00Z',
+    description: 'Hora de fin del slot (ISO 8601 con zona horaria).',
+    type: 'string',
+    format: 'date-time',
+  })
   horaFin: Date;
 }

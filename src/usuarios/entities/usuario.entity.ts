@@ -30,8 +30,8 @@ export class Usuario {
   @ApiProperty({
     description: 'Contraseña del usuario (almacenada como un hash)',
   })
-  @Column({ nullable: false })
-  contrasena: string; // contrasena (hash)
+  @Column({ nullable: false, select: false })
+  contrasena: string;
 
   @ApiProperty({ description: 'ID del rol asociado al usuario' })
   @Column({ name: 'id_rol', type: 'uuid', nullable: false })
